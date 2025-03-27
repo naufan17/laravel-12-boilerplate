@@ -2,7 +2,6 @@
 
 // use App\Http\Middleware\EnsureTokenIsValid;
 
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -12,6 +11,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             // 'auth' => EnsureTokenIsValid::class,
             'throttle' => ThrottleRequests::class,
-            'sanctum' => EnsureFrontendRequestsAreStateful::class,
+            // 'sanctum' => EnsureFrontendRequestsAreStateful::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -57,11 +57,11 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 405);
         });
 
-        $exceptions->render(function (ServerException $e) {
+        $exceptions->render(function (TooManyRequestsHttpException $e) {
             return response()->json([
-                'message' => 'Internal server error',
+                'message' => 'Too many requests, please try again later',
                 'error' => $e->getMessage(),
-            ], 500);
+            ], 429);
         });
 
     })->create();

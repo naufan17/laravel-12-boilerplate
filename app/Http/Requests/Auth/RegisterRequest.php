@@ -57,6 +57,6 @@ class RegisterRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'message' => 'Validation failed',
             'errors' => $validator->errors(),
-        ], 422));
+        ], 400));
     }
 }

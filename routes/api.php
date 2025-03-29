@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->middleware('throttle:api')->group( function (): void {
@@ -17,4 +18,8 @@ Route::prefix('auth')->middleware('throttle:api')->group( function (): void {
         // Route::post('/email/verification-notification')->name('verification.send');
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     });
+});
+
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
+    Route::get('/user', [UserController::class, 'index'])->name('user');
 });
